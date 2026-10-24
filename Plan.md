@@ -100,8 +100,15 @@ devuelve el índice con HTTPS válido.
 - [ ] Crear proyecto Angular (standalone, SCSS, *signals*, sin SSR) en `frontal`.
 - [ ] Configurar la compilación en `dist/` (`outputPath: { base: "dist", browser: "" }`)
       y el script `npm run build` que usa el workflow `publicar.yml`.
-- [ ] Rutas: `/:idioma/:fecha` (por defecto hoy en `Europe/Madrid`), con validación
-      de fecha y redirección de rutas desconocidas.
+- [ ] Rutas con `/` (`PathLocationStrategy`): `/:idioma/:fecha` (por defecto hoy en
+      `Europe/Madrid`), validación de fecha y redirección de `/` y de rutas
+      desconocidas desde el router (README §3.7).
+- [ ] `<base href="/">` y recursos (traducciones, iconos) con rutas absolutas.
+- [ ] Manejador de errores de navegación: ante un fallo de carga de módulo
+      (`ChunkLoadError` tras un despliegue) recargar la página una sola vez.
+- [ ] CSP mediante `<meta http-equiv="Content-Security-Policy">` en `index.html`
+      (permitir `connect-src https://datos.pvpc.linaresdigital.com`).
+- [ ] Metadatos Open Graph genéricos en `index.html` para las vistas previas.
 - [ ] `PreciosService`: URL base configurable por entorno, caché en memoria,
       404 → día sin datos, errores de red con mensaje y reintento.
 - [ ] Componente de día *mobile-first*:
@@ -148,8 +155,11 @@ saltos de diseño.
       `navigator.language`, selector visible y preferencia guardada en `localStorage`.
 - [ ] Formato de fechas, números y moneda con `Intl` según el idioma
       (p. ej. `0,12345 €/kWh` frente a `€0.12345/kWh`).
-- [ ] Actualizar `<html lang>`, `<title>` y meta descripción al cambiar de idioma;
-      etiquetas `hreflang` en `index.html`.
+- [ ] Actualizar `<html lang>`, `<title>` y meta descripción al cambiar de idioma.
+- [ ] Script `scripts/paginas-entrada.mjs` ejecutado tras `ng build` (dentro de
+      `npm run build`): genera `/index.html` y `/{es,en,fr,de,it,pt}/index.html` con
+      `lang`, `<title>`, descripción, Open Graph y `hreflang` por idioma, para que
+      las páginas de entrada respondan 200 en lugar de pasar por `404.html`.
 - [ ] Revisión de traducciones por hablantes nativos o fuente fiable; test que
       verifica que todos los ficheros tienen las mismas claves.
 
@@ -165,7 +175,10 @@ ficheros de idioma están completos.
       transmitida sólo por color, foco visible, lectores de pantalla.
 - [ ] Lighthouse móvil ≥ 90 en rendimiento, accesibilidad y buenas prácticas.
 - [ ] Modo oscuro según `prefers-color-scheme`.
-- [ ] Metadatos para compartir (Open Graph) e icono/manifest básico.
+- [ ] Icono y *manifest* básico; comprobar las vistas previas al compartir las
+      páginas de entrada de cada idioma.
+- [ ] Verificar que `/` y `/{idioma}/` responden 200 y que una URL con fecha
+      cargada directamente funciona (vía `404.html`).
 
 ## Fase 8 · Puesta en producción y operación
 

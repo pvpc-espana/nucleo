@@ -211,6 +211,7 @@ subdominio.
   `actions/upload-pages-artifact` + `actions/deploy-pages`. El código compilado no
   se guarda en Git y el dominio propio se configura en *Settings → Pages* (con
   este método GitHub ignora el fichero `CNAME`).
+- **Rutas con `/` (no `#`)** sobre GitHub Pages; ver §3.7.
 
 ### 3.6 ¿Por qué dos métodos de publicación?
 
@@ -220,6 +221,24 @@ subdominio.
 - **`frontal` publica con GitHub Actions**: necesita Node para compilar; así no se
   versionan ficheros generados (con *hash* en el nombre, que ensuciarían el
   historial y provocarían conflictos) y sólo se publica lo que pasa las pruebas.
+
+### 3.7 Rutas en GitHub Pages: limitaciones y soluciones
+
+Se usan rutas basadas en `/` (`PathLocationStrategy`) en lugar de `#`: URLs limpias
+e indexables. GitHub Pages sólo sirve ficheros existentes, así que una ruta como
+`/es/2026-10-24` se resuelve con `404.html` (copia de `index.html`): Angular arranca
+y el router muestra el día pedido. Limitaciones y cómo se resuelven:
+
+| Limitación | Solución adoptada |
+|---|---|
+| Las rutas profundas responden con estado HTTP **404** aunque la página funcione (buscadores, vistas previas y monitores pueden tratarlas como error). | Tras `ng build`, el script `scripts/paginas-entrada.mjs` genera ficheros reales para `/` y `/{es,en,fr,de,it,pt}/index.html` a partir de `index.html`, con su `lang`, `<title>`, descripción, Open Graph y `hreflang` tomados de los ficheros de traducción, de modo que las páginas de entrada responden **200**. Las URLs con fecha siguen resolviéndose por `404.html` (son vistas efímeras sin valor para indexar). |
+| Las vistas previas al compartir (WhatsApp, Telegram…) no ejecutan JavaScript. | Metadatos Open Graph completos y genéricos en `index.html`, y específicos por idioma en las páginas de entrada. |
+| No se pueden definir cabeceras HTTP ni redirecciones de servidor (la caché la fija GitHub en ~10 min). | CSP mediante `<meta http-equiv="Content-Security-Policy">`; redirecciones (`/` → `/<idioma>/`, rutas desconocidas) en el router de Angular. |
+| Tras un despliegue, quien tenga la app abierta conserva un `index.html` que apunta a ficheros con *hash* ya inexistentes (`ChunkLoadError` en módulos de carga diferida). | Pocos módulos de carga diferida y un manejador de errores de navegación que, ante un fallo de carga de módulo, recarga la página una sola vez. |
+| Las rutas relativas fallarían dentro de una subruta (`/es/2026-10-24/assets/...`). | `<base href="/">` y recursos (traducciones, iconos) con rutas absolutas; el sitio vive en la raíz del dominio. |
+
+Otros límites de GitHub Pages (1 GB por sitio, ~100 GB de tráfico mensual
+orientativo) quedan muy por encima del uso previsto.
 
 ## 4. Tecnologías
 
