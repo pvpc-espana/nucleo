@@ -109,11 +109,19 @@ devuelve el índice con HTTPS válido.
 - [ ] CSP mediante `<meta http-equiv="Content-Security-Policy">` en `index.html`
       (permitir `connect-src https://datos.pvpc.linaresdigital.com`).
 - [ ] Metadatos Open Graph genéricos en `index.html` para las vistas previas.
+- [ ] Temas desde el inicio (README §3.8): variables CSS por tema, modo
+      Automático/Claro/Oscuro con selector en la cabecera y preferencia en
+      `localStorage`, escucha de cambios de `prefers-color-scheme`, `color-scheme`
+      y `theme-color` actualizados, y script en línea en `<head>` (con su *hash* en
+      la CSP) que evita el destello del tema equivocado.
+- [ ] Confirmar los umbrales reales del flujo de n8n y fijarlos en `umbrales.ts`,
+      con tests que reproduzcan la clasificación del correo del 25/10/2026.
 - [ ] `PreciosService`: URL base configurable por entorno, caché en memoria,
       404 → día sin datos, errores de red con mensaje y reintento.
 - [ ] Componente de día *mobile-first*:
   - cabecera con fecha y resumen (mín., máx., media, precio actual);
-  - gráfico de barras SVG + lista de horas con color por tramo (barato/medio/caro);
+  - gráfico de barras SVG + lista de horas con color e icono por tramo (muy
+    barata ✅, barata, media, cara ⚠️) según `umbrales.ts` (README §3.8);
   - hora actual resaltada y desplazada a la vista;
   - **rejilla fija de horas** (23/24/25 según el día) también cuando no hay datos,
     con un aviso «Precios aún no publicados» sin alterar el diseño.
@@ -174,7 +182,8 @@ ficheros de idioma están completos.
 - [ ] Accesibilidad WCAG 2.1 AA: contraste de los colores de tramo, información no
       transmitida sólo por color, foco visible, lectores de pantalla.
 - [ ] Lighthouse móvil ≥ 90 en rendimiento, accesibilidad y buenas prácticas.
-- [ ] Modo oscuro según `prefers-color-scheme`.
+- [ ] Revisar contraste de los colores de tramo en ambos temas y que el selector de
+      tema es accesible (teclado, lector de pantalla).
 - [ ] Icono y *manifest* básico; comprobar las vistas previas al compartir las
       páginas de entrada de cada idioma.
 - [ ] Verificar que `/` y `/{idioma}/` responden 200 y que una URL con fecha

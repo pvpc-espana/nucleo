@@ -43,8 +43,10 @@ historial de commits del repositorio `datos`.
   - Los días sin precios muestran igualmente la rejilla de horas vacía para que el
     diseño no cambie.
   - Cambio de día **sin recargar la página** (SPA con URL enlazable por fecha).
-  - Precio actual resaltado, mínimo, máximo y media del día, y franjas
-    baratas/medias/caras.
+  - Precio actual resaltado, mínimo, máximo y media del día.
+  - Cada hora con **color e icono según umbrales de precio** (barata, media, cara,
+    muy barata), como en el correo diario que ya genera el flujo de n8n (§3.8).
+  - **Tema claro/oscuro** según el sistema operativo, con cambio manual (§3.8).
 - Interfaz en **6 idiomas**: castellano (por defecto), inglés, francés, alemán,
   italiano y portugués, con formato de números, fechas y moneda según el idioma.
 - Horas expresadas en **hora peninsular** (`Europe/Madrid`), contemplando los días de
@@ -212,6 +214,7 @@ subdominio.
   se guarda en Git y el dominio propio se configura en *Settings → Pages* (con
   este método GitHub ignora el fichero `CNAME`).
 - **Rutas con `/` (no `#`)** sobre GitHub Pages; ver §3.7.
+- **Temas y clasificación visual de precios**; ver §3.8.
 
 ### 3.6 ¿Por qué dos métodos de publicación?
 
@@ -239,6 +242,51 @@ y el router muestra el día pedido. Limitaciones y cómo se resuelven:
 
 Otros límites de GitHub Pages (1 GB por sitio, ~100 GB de tráfico mensual
 orientativo) quedan muy por encima del uso previsto.
+
+### 3.8 Temas y clasificación visual de precios
+
+**Temas**
+
+- Tres modos: **Automático** (por defecto, sigue `prefers-color-scheme` del sistema
+  y reacciona en vivo si el sistema cambia), **Claro** y **Oscuro**, elegibles con
+  un selector en la cabecera. La elección se guarda en `localStorage`.
+- Implementación con variables CSS (*design tokens*) en `:root` y el atributo
+  `data-tema="claro|oscuro"` en `<html>`; `color-scheme` y
+  `<meta name="theme-color">` se actualizan para que barras del navegador,
+  controles nativos y barras de desplazamiento sigan el tema.
+- Para evitar el destello del tema equivocado al cargar, un pequeño script en línea
+  en `<head>` aplica el tema guardado antes de que arranque Angular (su *hash* se
+  incluye en la CSP de `index.html`).
+- Los colores de los tramos tienen una variante por tema para mantener contraste
+  WCAG AA (p. ej. el naranja sobre blanco necesita un tono más oscuro que sobre
+  fondo oscuro).
+
+**Clasificación de cada hora** (basada en el correo diario de n8n)
+
+Cada hora combina un **color** (tramo) y un **icono**:
+
+| Tramo | Color | Icono | Regla por defecto (a confirmar) |
+|---|---|---|---|
+| Muy barata | verde | ✅ | Tramo barato y precio ≤ 0,10 €/kWh |
+| Barata | verde | 🔘 | Precio en el tercio inferior del rango del día (`(p − mín) / (máx − mín) < 1/3`) |
+| Media | naranja | 🔘 | Tercio central del rango del día |
+| Cara | rojo | ⚠️ | Tercio superior del rango del día (`≥ 2/3`) |
+
+Las reglas se infieren del correo del 25/10/2026, al que se ajustan exactamente
+(p. ej. 0,1190 €: verde 🔘; 0,0545 €: verde ✅; 0,2326 €: naranja; 0,3095 €: rojo
+⚠️). Los umbrales viven en un único fichero de configuración del frontal
+(`umbrales.ts`) para poder ajustarlos sin tocar los componentes.
+
+- En la web los iconos se dibujan como SVG propios (aspecto idéntico en todos los
+  sistemas, a diferencia de los emojis) y llevan texto accesible traducido
+  («muy barata», «cara»…); la información nunca depende sólo del color.
+- El color se aplica a la barra del gráfico y a la fila de la lista; el resumen
+  del día muestra el mínimo y el máximo con su icono.
+
+> El correo de ejemplo corresponde al 25/10/2026, día de **25 horas** por el cambio
+> al horario de invierno, y sólo lista de 02:00 a 23:00 (faltan 00:00, 01:00 y la
+> repetición de 02:00). La web debe mostrar siempre todas las horas del día
+> (README §3.4: `inicio` con desfase horario explícito).
 
 ## 4. Tecnologías
 
