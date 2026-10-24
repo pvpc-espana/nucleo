@@ -351,3 +351,8 @@ nucleo/
 
 GPL-3.0. Los datos de precios proceden de Red Eléctrica de España y se publican
 según sus condiciones de uso.
+
+## Agradecimientos
+
+Gracias a [Claude](https://claude.ai), de [Anthropic](https://www.anthropic.com), por su
+inestimable ayuda en la creación y depuración de este proyecto.
