@@ -181,11 +181,24 @@ saltos de diseño.
 - [ ] Opcional: notificaciones *push* (Web Push) con un pequeño servicio externo,
       una vez la web sea instalable (PWA).
 
+## Fase 5c · Aplicación instalable (PWA)
+
+- [x] Manifiesto completo (`id`, `scope`, `description`, iconos 192/512 y *maskable*).
+- [x] *Service worker* de Angular: recursos precargados, JSON de precios con
+      estrategia *freshness* (red primero, caché sin conexión) y `ngsw.json`
+      recalculado tras generar las páginas de entrada.
+- [x] Aviso «Nueva versión disponible · Actualizar» (comprobación cada 30 minutos y
+      al volver a la pestaña); recarga automática si la caché queda inservible.
+- [x] Botón «Instalar»: diálogo del navegador (`beforeinstallprompt`) en Chrome, Edge y
+      Samsung Internet; instrucciones en iPhone/iPad; oculto si ya está instalada.
+- [x] Traducciones empaquetadas con *hash* (nunca se mezclan con versiones en caché).
+- [ ] Opcional: capturas en el manifiesto para el diálogo de instalación enriquecido.
+
 ## Fase 6 · Internacionalización
 
 **Objetivo:** interfaz completa en es, en, fr, de, it y pt.
 
-- [x] Integrar Transloco con carga perezosa de `public/i18n/{es,en,fr,de,it,pt}.json`.
+- [x] Integrar Transloco con carga perezosa de `src/i18n/{es,en,fr,de,it,pt}.json` (módulos con *hash*).
 - [x] Idioma en la URL (`/en/2026-10-24`), detección inicial por
       `navigator.language`, selector visible y preferencia guardada en `localStorage`.
 - [x] Formato de fechas, números y moneda con `Intl` según el idioma

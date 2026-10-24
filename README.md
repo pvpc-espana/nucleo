@@ -50,6 +50,8 @@ historial de commits del repositorio `datos`.
   - **Recordatorios**: marcar horas (o las más baratas) y añadirlas al calendario
     del dispositivo (`.ics`) o a Google Calendar, con aviso al comienzo de cada
     franja.
+  - **Instalable como aplicación** (PWA) en móvil y escritorio, con funcionamiento
+    sin conexión y aviso de nuevas versiones.
 - Interfaz en **6 idiomas**: castellano (por defecto), inglés, francés, alemán,
   italiano y portugués, con formato de números, fechas y moneda según el idioma.
 - Horas expresadas en **hora peninsular** (`Europe/Madrid`), contemplando los días de
@@ -59,7 +61,7 @@ historial de commits del repositorio `datos`.
 
 - Precios de Ceuta y Melilla (serie PVPC propia) y visualización en hora canaria.
 - Términos de potencia, peajes desglosados, simulación de factura.
-- Notificaciones push / alertas de precio, PWA instalable con modo sin conexión.
+- Notificaciones push / alertas de precio (Web Push con un servicio externo).
 - Comparativas históricas (semanal, mensual, anual).
 - Cuentas de usuario o cualquier dato personal.
 
