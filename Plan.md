@@ -212,7 +212,6 @@ ficheros de idioma están completos.
 - Recomendación de las mejores franjas para consumir (calculada de forma
   determinista a partir de los precios, como alternativa al modelo de lenguaje que
   usa el flujo de n8n).
-
 - PVPC de Ceuta y Melilla y opción de hora canaria.
 - PWA instalable con caché sin conexión y notificaciones de horas baratas.
 - Vistas semanal/mensual e histórico comparativo.
