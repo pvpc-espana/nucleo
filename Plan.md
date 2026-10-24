@@ -22,7 +22,7 @@ Arquitectura, formato de datos y tecnologías: ver [`README.md`](README.md).
   - privada en `nucleo` → secreto `DATOS_DEPLOY_KEY`.
 - [ ] Proteger la rama principal de `datos` permitiendo el push de la clave de
       despliegue (o dejarla sin protección si sólo escribe el núcleo).
-- [ ] (Opcional) Solicitar *token* de e·sios y guardarlo como `ESIOS_TOKEN`.
+- [ ] Guardar el *token* de e·sios en `nucleo` como secreto de Actions `TESTIGO`.
 
 **Hecho cuando:** los registros DNS resuelven y el secreto está creado.
 
@@ -31,12 +31,15 @@ Arquitectura, formato de datos y tecnologías: ver [`README.md`](README.md).
 **Objetivo:** un comando Python que, dada una fecha, genera el JSON v1 del día.
 
 - [ ] Estructura del paquete `pvpc/`, `pyproject.toml`, configuración de `ruff` y `pytest`.
-- [ ] Explorar la respuesta real de `apidatos.ree.es` y documentarla con ejemplos
+- [ ] Explorar la respuesta real de e·sios (indicador 1001) y de `apidatos.ree.es`
+      y documentarlas con ejemplos
       guardados en `tests/fixtures/` (día normal, día de 23 h, día de 25 h, día no
       publicado aún, error del servidor).
 - [ ] Validar la granularidad del PVPC (horaria o cuartohoraria) y fijar `resolucion`.
-- [ ] Cliente `fuente_ree.py` con tiempo de espera, reintentos con espera exponencial
-      y cabecera `User-Agent` identificativa.
+- [ ] Cliente `fuente_esios.py` que lee el *token* de la variable de entorno
+      `TESTIGO`, con tiempo de espera, reintentos con espera exponencial y cabecera
+      `User-Agent` identificativa; sin exponer el *token* en registros.
+- [ ] Cliente de respaldo `fuente_ree.py` (`apidatos.ree.es`) usado sólo si e·sios falla.
 - [ ] `normalizar.py`: selección de la serie PVPC, conversión €/MWh → €/kWh,
       redondeo a 5 decimales, `inicio` con desfase horario `Europe/Madrid`, cálculo
       de `resumen` (mín., máx., media).
@@ -61,6 +64,7 @@ válido y los tests pasan.
   - `schedule` con los 4 cron de README §3.2 y `workflow_dispatch` (fecha opcional);
   - `concurrency: actualizar-datos` para evitar ejecuciones solapadas;
   - checkout de `nucleo` y de `datos` (ruta `datos/`, `ssh-key: DATOS_DEPLOY_KEY`);
+  - `env: TESTIGO: ${{ secrets.TESTIGO }}` sólo en el paso que consulta la API;
   - ejecución del comando, `git status --porcelain` y commit/push sólo si hay
     cambios, con mensaje tipo `PVPC 2026-10-25` y autor bot identificable;
   - permisos mínimos (`contents: read` en `nucleo`).

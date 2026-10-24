@@ -67,14 +67,14 @@ historial de commits del repositorio `datos`.
 ┌──────────────────────────────────────────────────────┐
 │  nucleo  (GitHub Actions)                            │
 │  1. Determina fechas a consultar (hoy, mañana)       │
-│  2. Consulta API pública de REE                      │
+│  2. Consulta e·sios (secreto TESTIGO)                │
 │  3. Valida y normaliza → JSON v1                     │
 │  4. Clona `datos` con clave de despliegue (SSH)      │
 │  5. Escribe ficheros; commit + push sólo si cambian  │
 └──────────────────────────────────────────────────────┘
-          │ API REE (HTTPS)               │ git push (deploy key, escritura)
+          │ API e·sios (HTTPS)            │ git push (deploy key, escritura)
           ▼                               ▼
-  apidatos.ree.es             ┌────────────────────────────────┐
+  api.esios.ree.es            ┌────────────────────────────────┐
                               │ datos  (GitHub Pages, /docs)   │
                               │ datos.pvcp.linaresdigital.com  │
                               └────────────────────────────────┘
@@ -92,13 +92,17 @@ historial de commits del repositorio `datos`.
 
 ### 3.1 Fuente de datos
 
-- **Principal:** API pública de Red Eléctrica (REE), sin autenticación:
-  `https://apidatos.ree.es/es/datos/mercados/precios-mercados-tiempo-real?start_date=AAAA-MM-DDT00:00&end_date=AAAA-MM-DDT23:59&time_trunc=hour`
-  — de la respuesta se extrae la serie **PVPC** (la del mercado *spot* se ignora o se
-  guarda como dato auxiliar).
-- **Alternativa/respaldo (opcional):** API de e·sios (indicador `1001`, PVPC 2.0TD),
-  que requiere un *token* personal gratuito solicitado a REE; se guardaría como
-  secreto `ESIOS_TOKEN` y sólo se usaría si la API principal falla.
+- **Principal:** API de e·sios (REE), indicador **`1001`** (PVPC 2.0TD), autenticada
+  con un *token* personal guardado como secreto de Actions **`TESTIGO`**:
+  `https://api.esios.ree.es/indicators/1001?start_date=AAAA-MM-DDT00:00&end_date=AAAA-MM-DDT23:59`
+  con las cabeceras `Accept: application/json; application/vnd.esios-api-v1+json` y
+  `x-api-key: <TESTIGO>`. Permite obtener el día siguiente en cuanto se publica y
+  también días pasados (carga histórica). De la respuesta se toman los valores de la
+  zona peninsular (`geo_id` 8741), que aplican también a Baleares y Canarias.
+- **Respaldo (sin autenticación):** API pública `apidatos.ree.es`
+  (`/es/datos/mercados/precios-mercados-tiempo-real?...&time_trunc=hour`), serie
+  PVPC; sólo se usa si e·sios falla.
+- El *token* nunca se escribe en los registros ni en los ficheros publicados.
 - Los valores llegan en €/MWh y se publican convertidos a **€/kWh** con 5 decimales.
 - Desde octubre de 2025 el mercado diario opera en periodos **cuartohorarios**. El
   formato de datos incluye el campo `resolucion` y una lista de periodos de longitud
@@ -211,7 +215,7 @@ subdominio.
 | Núcleo | Python 3.12+ (biblioteca estándar: `urllib`, `json`, `zoneinfo`), `pytest`, `ruff` |
 | Automatización | GitHub Actions (`schedule`, `workflow_dispatch`, `concurrency`) |
 | Acceso a `datos` | Clave de despliegue SSH ed25519 con permiso de escritura + secreto de Actions |
-| Fuente de datos | API pública REE (`apidatos.ree.es`); e·sios como respaldo opcional |
+| Fuente de datos | API e·sios de REE, indicador 1001, con secreto `TESTIGO`; `apidatos.ree.es` como respaldo |
 | Alojamiento | GitHub Pages (rama principal, carpeta `/docs`) con dominio propio y HTTPS |
 | DNS | Registros `CNAME` de `pvcp` y `datos.pvcp` hacia `pvpc-espana.github.io` |
 | Frontal | Angular (versión estable vigente), TypeScript, SCSS, Transloco, `Intl` |
@@ -227,7 +231,8 @@ nucleo/
 │   ├── actualizar.yml        # cron ×4 + manual: obtiene y publica precios
 │   └── pruebas.yml           # lint + tests en cada push/PR
 ├── pvpc/
-│   ├── fuente_ree.py         # cliente de la API de REE
+│   ├── fuente_esios.py       # cliente de e·sios (secreto TESTIGO)
+│   ├── fuente_ree.py         # cliente de respaldo (apidatos.ree.es)
 │   ├── normalizar.py         # validación y conversión al formato v1
 │   ├── publicar.py           # escritura de ficheros e índice
 │   └── __main__.py           # CLI: python -m pvpc --salida ../datos/docs [--fecha …]
