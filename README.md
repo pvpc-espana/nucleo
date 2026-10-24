@@ -222,9 +222,10 @@ subdominio.
   numérico/fechas con `Intl`. Permite cambiar de idioma sin recargar y mantener un
   único *build*.
 - **Publicación con GitHub Actions** (workflow `publicar.yml`): en cada push a
-  `main` se ejecutan lint y tests, se compila con `ng build`
-  (`outputPath: { base: "dist", browser: "" }`), se copia `index.html` como
-  `404.html` para que las rutas profundas funcionen y se despliega con
+  `main` se ejecutan formato y tests, se compila con `npm run build` (`ng build`
+  con `outputPath: { base: "dist", browser: "" }` seguido de
+  `scripts/paginas-entrada.mjs`, que genera `404.html`, las páginas de entrada por
+  idioma y la CSP) y se despliega con
   `actions/upload-pages-artifact` + `actions/deploy-pages`. El código compilado no
   se guarda en Git y el dominio propio se configura en *Settings → Pages* (con
   este método GitHub ignora el fichero `CNAME`).
@@ -317,9 +318,9 @@ componentes.
 | Fuente de datos | API e·sios de REE, indicador 1001, con secreto `TESTIGO`; `apidatos.ree.es` como respaldo |
 | Alojamiento | GitHub Pages con dominio propio y HTTPS: `datos` desde rama (`main`, `/docs`); `frontal` desde GitHub Actions |
 | DNS | Registros `CNAME` de `pvpc` y `datos.pvpc` hacia `pvpc-espana.github.io` |
-| Frontal | Angular (versión estable vigente), TypeScript, SCSS, Transloco, `Intl` |
-| Gráficos | SVG generado por el propio componente (sin librería de gráficos) |
-| Pruebas frontal | Vitest (unitarias), Playwright (extremo a extremo, emulación móvil) |
+| Frontal | Angular 22 (sin zone.js), TypeScript, SCSS, Transloco, `Intl`, fuente Inter |
+| Gráficos | Barras con CSS Grid generadas por el propio componente (sin librería de gráficos) |
+| Pruebas frontal | Vitest (unitarias); Playwright (extremo a extremo, emulación móvil) previsto en la fase 7 |
 | Calidad | ESLint, Prettier, Lighthouse (rendimiento y accesibilidad) |
 
 ## 5. Estructura prevista de este repositorio

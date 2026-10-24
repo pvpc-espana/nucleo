@@ -11,9 +11,9 @@ Arquitectura, formato de datos y tecnologías: ver [`README.md`](README.md).
 
 **Objetivo:** que los tres repositorios y los dominios estén listos para publicar.
 
-- [ ] DNS: crear `CNAME pvpc → pvpc-espana.github.io` y
+- [x] DNS: crear `CNAME pvpc → pvpc-espana.github.io` y
       `CNAME datos.pvpc → pvpc-espana.github.io`.
-- [ ] Verificar el dominio `linaresdigital.com` en la organización de GitHub
+- [x] Verificar el dominio `linaresdigital.com` en la organización de GitHub
       (*Settings → Pages → Verified domains*) para evitar apropiaciones de subdominios.
 - [ ] Generar la clave de despliegue ed25519 (README §3.3):
   - pública en `datos` → *Deploy keys* con escritura;
@@ -28,23 +28,23 @@ Arquitectura, formato de datos y tecnologías: ver [`README.md`](README.md).
 
 **Objetivo:** un comando Python que, dada una fecha, genera el JSON v1 del día.
 
-- [ ] Estructura del paquete `pvpc/`, `pyproject.toml`, configuración de `ruff` y `pytest`.
+- [x] Estructura del paquete `pvpc/`, `pyproject.toml`, configuración de `ruff` y `pytest`.
 - [ ] Explorar la respuesta real de e·sios (indicador 1001) y de `apidatos.ree.es`
       y documentarlas con ejemplos
       guardados en `tests/fixtures/` (día normal, día de 23 h, día de 25 h, día no
       publicado aún, error del servidor).
 - [ ] Validar la granularidad del PVPC (horaria o cuartohoraria) y fijar `resolucion`.
-- [ ] Cliente `fuente_esios.py` que lee el *token* de la variable de entorno
+- [x] Cliente `fuente_esios.py` que lee el *token* de la variable de entorno
       `TESTIGO`, con tiempo de espera, reintentos con espera exponencial y cabecera
       `User-Agent` identificativa; sin exponer el *token* en registros.
-- [ ] Cliente de respaldo `fuente_ree.py` (`apidatos.ree.es`) usado sólo si e·sios falla.
-- [ ] `normalizar.py`: selección de la serie PVPC, conversión €/MWh → €/kWh,
+- [x] Cliente de respaldo `fuente_ree.py` (`apidatos.ree.es`) usado sólo si e·sios falla.
+- [x] `normalizar.py`: selección de la serie PVPC, conversión €/MWh → €/kWh,
       redondeo a 5 decimales, `inicio` con desfase horario `Europe/Madrid`, cálculo
       de `resumen` (mín., máx., media).
-- [ ] Validaciones: número de periodos coherente con el día (23/24/25 h o
+- [x] Validaciones: número de periodos coherente con el día (23/24/25 h o
       92/96/100 cuartos), precios numéricos y dentro de un rango razonable; un día
       incompleto **no se publica**.
-- [ ] Tests unitarios con las *fixtures* (sin red).
+- [x] Tests unitarios con las *fixtures* (sin red).
 
 **Hecho cuando:** `python -m pvpc --fecha 2026-10-25 --salida /tmp/x` genera un JSON
 válido y los tests pasan.
@@ -53,14 +53,14 @@ válido y los tests pasan.
 
 **Objetivo:** ejecución automática 4 veces al día que publica sólo si hay cambios.
 
-- [ ] `publicar.py`: escribe `v1/AAAA/MM/AAAA-MM-DD.json` con serialización
+- [x] `publicar.py`: escribe `v1/AAAA/MM/AAAA-MM-DD.json` con serialización
       determinista (claves ordenadas, sangría fija, salto de línea final) y
       actualiza `indice.json` **sólo** si algún fichero diario cambió.
-- [ ] Lógica de fechas: siempre hoy y mañana en `Europe/Madrid`; mañana sin publicar
+- [x] Lógica de fechas: siempre hoy y mañana en `Europe/Madrid`; mañana sin publicar
       no es error. Parámetro opcional para fechas concretas o rangos. El rango de
       la consulta va de medianoche a medianoche en `Europe/Madrid` con desfase
       explícito (nunca calculado en UTC), con tests de los días de 23 y 25 horas.
-- [ ] `.github/workflows/actualizar.yml`:
+- [x] `.github/workflows/actualizar.yml`:
   - `schedule` con los 8 cron de README §3.2 (07:00, 20:10, 21:00 y 23:30 hora
     peninsular, en sus versiones de invierno y verano) y `workflow_dispatch`
     (fecha o rango opcional);
@@ -73,11 +73,11 @@ válido y los tests pasan.
   - ejecución del comando, `git status --porcelain` y commit/push sólo si hay
     cambios, con mensaje tipo `PVPC 2026-10-25` y autor bot identificable;
   - permisos mínimos (`contents: read` en `nucleo`).
-- [ ] `.github/workflows/pruebas.yml`: `ruff` + `pytest` en cada push y PR.
-- [ ] Mantenimiento del cron: evitar la desactivación por 60 días de inactividad
+- [x] `.github/workflows/pruebas.yml`: `ruff` + `pytest` en cada push y PR.
+- [x] Mantenimiento del cron: evitar la desactivación por 60 días de inactividad
       (p. ej. workflow mensual que reactiva el workflow vía API o commit de
       mantenimiento en `nucleo`).
-- [ ] Alertas: el fallo del workflow notifica por correo a los responsables;
+- [x] Alertas: el fallo del workflow notifica por correo a los responsables;
       opcionalmente abrir una *issue* automática si mañana no se ha publicado en la
       ejecución de las 23:30.
 
@@ -88,9 +88,9 @@ válido y los tests pasan.
 
 **Objetivo:** datos accesibles en `https://datos.pvpc.linaresdigital.com/v1/...`.
 
-- [ ] Estructura inicial `docs/` con `CNAME`, `.nojekyll`, `index.html` informativo y
+- [x] Estructura inicial `docs/` con `CNAME`, `.nojekyll`, `index.html` informativo y
       `v1/indice.json`.
-- [ ] Activar GitHub Pages (rama principal, carpeta `/docs`), dominio propio y
+- [x] Activar GitHub Pages (rama principal, carpeta `/docs`), dominio propio y
       «Enforce HTTPS».
 - [ ] README de `datos` con el formato v1, política de versiones y licencia/origen.
 - [ ] Carga histórica (*backfill*) desde la fecha de inicio elegida mediante
@@ -104,29 +104,29 @@ devuelve el índice con HTTPS válido.
 
 **Objetivo:** SPA publicada que muestra los precios de un día.
 
-- [ ] Crear proyecto Angular (standalone, SCSS, *signals*, sin SSR) en `frontal`.
-- [ ] Configurar la compilación en `dist/` (`outputPath: { base: "dist", browser: "" }`)
+- [x] Crear proyecto Angular (standalone, SCSS, *signals*, sin SSR) en `frontal`.
+- [x] Configurar la compilación en `dist/` (`outputPath: { base: "dist", browser: "" }`)
       y el script `npm run build` que usa el workflow `publicar.yml`.
-- [ ] Rutas con `/` (`PathLocationStrategy`): `/:idioma/:fecha` (por defecto hoy en
+- [x] Rutas con `/` (`PathLocationStrategy`): `/:idioma/:fecha` (por defecto hoy en
       `Europe/Madrid`), validación de fecha y redirección de `/` y de rutas
       desconocidas desde el router (README §3.7).
-- [ ] `<base href="/">` y recursos (traducciones, iconos) con rutas absolutas.
-- [ ] Manejador de errores de navegación: ante un fallo de carga de módulo
+- [x] `<base href="/">` y recursos (traducciones, iconos) con rutas absolutas.
+- [x] Manejador de errores de navegación: ante un fallo de carga de módulo
       (`ChunkLoadError` tras un despliegue) recargar la página una sola vez.
-- [ ] CSP mediante `<meta http-equiv="Content-Security-Policy">` en `index.html`
+- [x] CSP mediante `<meta http-equiv="Content-Security-Policy">` en `index.html`
       (permitir `connect-src https://datos.pvpc.linaresdigital.com`).
-- [ ] Metadatos Open Graph genéricos en `index.html` para las vistas previas.
-- [ ] Temas desde el inicio (README §3.8): variables CSS por tema, modo
+- [x] Metadatos Open Graph genéricos en `index.html` para las vistas previas.
+- [x] Temas desde el inicio (README §3.8): variables CSS por tema, modo
       Automático/Claro/Oscuro con selector en la cabecera y preferencia en
       `localStorage`, escucha de cambios de `prefers-color-scheme`, `color-scheme`
       y `theme-color` actualizados, y script en línea en `<head>` (con su *hash* en
       la CSP) que evita el destello del tema equivocado.
-- [ ] `umbrales.ts` con los umbrales del flujo de n8n (color: 0,33 / 0,66; icono:
+- [x] `umbrales.ts` con los umbrales del flujo de n8n (color: 0,33 / 0,66; icono:
       0,15 / 0,85 sobre la posición relativa en el rango del día) y tests que
       reproduzcan la clasificación del correo del 25/10/2026.
-- [ ] `PreciosService`: URL base configurable por entorno, caché en memoria,
+- [x] `PreciosService`: URL base configurable por entorno, caché en memoria,
       404 → día sin datos, errores de red con mensaje y reintento.
-- [ ] Componente de día *mobile-first*:
+- [x] Componente de día *mobile-first*:
   - cabecera con fecha y resumen (mín., máx., media, precio actual);
   - gráfico de barras SVG + lista de horas con color e icono por tramo (muy
     barata ✅, barata, media, cara ⚠️) según `umbrales.ts` (README §3.8);
@@ -136,7 +136,7 @@ devuelve el índice con HTTPS válido.
 - [x] Workflow `publicar.yml` de `frontal` (GitHub Actions): compila si existe
       `package.json` (o publica `provisional/` mientras no haya Angular), copia
       `index.html` como `404.html` y despliega con `actions/deploy-pages`.
-- [ ] Añadir al workflow los pasos de lint y tests antes de compilar.
+- [x] Añadir al workflow los pasos de lint y tests antes de compilar.
 - [x] GitHub Pages con fuente «GitHub Actions» y dominio `pvpc.linaresdigital.com`.
 - [ ] Activar «Enforce HTTPS» cuando el certificado esté emitido.
 
@@ -146,17 +146,17 @@ devuelve el índice con HTTPS válido.
 
 **Objetivo:** pasar de día sin recargar, con dedo, botones o teclado.
 
-- [ ] Botones «anterior/siguiente» en la parte **superior e inferior**, con etiquetas
+- [x] Botones «anterior/siguiente» en la parte **superior e inferior**, con etiquetas
       accesibles; el siguiente se deshabilita más allá del último día disponible
       según `indice.json` (permitiendo «mañana» aunque esté pendiente).
-- [ ] Directiva de deslizamiento con *Pointer Events*: umbral de distancia/velocidad,
+- [x] Directiva de deslizamiento con *Pointer Events*: umbral de distancia/velocidad,
       sin interferir con el *scroll* vertical (`touch-action: pan-y`).
       Deslizar a la izquierda → día siguiente; a la derecha → día anterior.
-- [ ] Animación de transición entre días respetando `prefers-reduced-motion`.
-- [ ] Flechas ← → del teclado y botón «Hoy».
-- [ ] Precarga del día anterior y siguiente; actualización de la URL con
+- [x] Animación de transición entre días respetando `prefers-reduced-motion`.
+- [x] Flechas ← → del teclado y botón «Hoy».
+- [x] Precarga del día anterior y siguiente; actualización de la URL con
       `Router.navigate` (historial del navegador coherente).
-- [ ] Refresco automático del día en curso/siguiente al volver a la pestaña tras
+- [x] Refresco automático del día en curso/siguiente al volver a la pestaña tras
       las ~20:30 si aún no había datos.
 
 **Hecho cuando:** en un móvil real se recorren varios días deslizando sin recargas ni
@@ -166,13 +166,13 @@ saltos de diseño.
 
 **Objetivo:** interfaz completa en es, en, fr, de, it y pt.
 
-- [ ] Integrar Transloco con carga perezosa de `assets/i18n/{es,en,fr,de,it,pt}.json`.
-- [ ] Idioma en la URL (`/en/2026-10-24`), detección inicial por
+- [x] Integrar Transloco con carga perezosa de `public/i18n/{es,en,fr,de,it,pt}.json`.
+- [x] Idioma en la URL (`/en/2026-10-24`), detección inicial por
       `navigator.language`, selector visible y preferencia guardada en `localStorage`.
-- [ ] Formato de fechas, números y moneda con `Intl` según el idioma
+- [x] Formato de fechas, números y moneda con `Intl` según el idioma
       (p. ej. `0,12345 €/kWh` frente a `€0.12345/kWh`).
-- [ ] Actualizar `<html lang>`, `<title>` y meta descripción al cambiar de idioma.
-- [ ] Script `scripts/paginas-entrada.mjs` ejecutado tras `ng build` (dentro de
+- [x] Actualizar `<html lang>`, `<title>` y meta descripción al cambiar de idioma.
+- [x] Script `scripts/paginas-entrada.mjs` ejecutado tras `ng build` (dentro de
       `npm run build`): genera `/index.html` y `/{es,en,fr,de,it,pt}/index.html` con
       `lang`, `<title>`, descripción, Open Graph y `hreflang` por idioma, para que
       las páginas de entrada respondan 200 en lugar de pasar por `404.html`.
@@ -184,7 +184,7 @@ ficheros de idioma están completos.
 
 ## Fase 7 · Calidad, accesibilidad y rendimiento
 
-- [ ] Tests unitarios (Vitest) de servicio, utilidades de fecha y tramos de precio.
+- [x] Tests unitarios (Vitest) de servicio, utilidades de fecha y tramos de precio.
 - [ ] Tests E2E (Playwright) con emulación móvil: carga, deslizamiento, botones,
       día sin datos, día de 23/25 horas, cambio de idioma.
 - [ ] Accesibilidad WCAG 2.1 AA: contraste de los colores de tramo, información no
