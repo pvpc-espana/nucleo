@@ -19,8 +19,8 @@ El proyecto se divide en tres repositorios dentro de la organización `pvpc-espa
 | Repositorio | Función | Publicación |
 |-------------|---------|-------------|
 | [`nucleo`](https://github.com/pvpc-espana/nucleo) | GitHub Action programada que consulta 4 veces al día la API pública de precios, normaliza los datos y los publica en `datos`. | — (sólo se ejecuta) |
-| [`datos`](https://github.com/pvpc-espana/datos) | Almacén de datos estáticos (JSON) en `/docs`, servidos por GitHub Pages. | `https://datos.pvcp.linaresdigital.com` |
-| [`frontal`](https://github.com/pvpc-espana/frontal) | Interfaz web (SPA) compilada en `/docs`, servida por GitHub Pages, que lee los JSON de `datos` mediante `fetch`. | `https://pvcp.linaresdigital.com` |
+| [`datos`](https://github.com/pvpc-espana/datos) | Almacén de datos estáticos (JSON) en `/docs`, servidos por GitHub Pages. | `https://datos.pvpc.linaresdigital.com` |
+| [`frontal`](https://github.com/pvpc-espana/frontal) | Interfaz web (SPA) compilada en `/docs`, servida por GitHub Pages, que lee los JSON de `datos` mediante `fetch`. | `https://pvpc.linaresdigital.com` |
 
 No hay servidor propio ni base de datos: todo es contenido estático versionado en Git
 y publicado con GitHub Pages. El histórico de precios queda registrado en el
@@ -76,13 +76,13 @@ historial de commits del repositorio `datos`.
           ▼                               ▼
   api.esios.ree.es            ┌────────────────────────────────┐
                               │ datos  (GitHub Pages, /docs)   │
-                              │ datos.pvcp.linaresdigital.com  │
+                              │ datos.pvpc.linaresdigital.com  │
                               └────────────────────────────────┘
                                           ▲ fetch (CORS: GitHub Pages
                                           │ responde con ACAO *)
                               ┌────────────────────────────────┐
                               │ frontal (GitHub Pages, /docs)  │
-                              │ pvcp.linaresdigital.com        │
+                              │ pvpc.linaresdigital.com        │
                               │ Angular SPA, 6 idiomas         │
                               └────────────────────────────────┘
                                           ▲
@@ -151,7 +151,7 @@ cuando cambia algún día), de modo que una ejecución sin datos nuevos no gener
 
 ```
 docs/
-├── CNAME                     # datos.pvcp.linaresdigital.com
+├── CNAME                     # datos.pvpc.linaresdigital.com
 ├── .nojekyll
 ├── index.html                # página informativa mínima
 └── v1/
@@ -217,7 +217,7 @@ subdominio.
 | Acceso a `datos` | Clave de despliegue SSH ed25519 con permiso de escritura + secreto de Actions |
 | Fuente de datos | API e·sios de REE, indicador 1001, con secreto `TESTIGO`; `apidatos.ree.es` como respaldo |
 | Alojamiento | GitHub Pages (rama principal, carpeta `/docs`) con dominio propio y HTTPS |
-| DNS | Registros `CNAME` de `pvcp` y `datos.pvcp` hacia `pvpc-espana.github.io` |
+| DNS | Registros `CNAME` de `pvpc` y `datos.pvpc` hacia `pvpc-espana.github.io` |
 | Frontal | Angular (versión estable vigente), TypeScript, SCSS, Transloco, `Intl` |
 | Gráficos | SVG generado por el propio componente (sin librería de gráficos) |
 | Pruebas frontal | Vitest (unitarias), Playwright (extremo a extremo, emulación móvil) |

@@ -10,11 +10,9 @@ Arquitectura, formato de datos y tecnologías: ver [`README.md`](README.md).
 ## Fase 0 · Preparación de la infraestructura
 
 **Objetivo:** que los tres repositorios y los dominios estén listos para publicar.
-
-- [ ] Confirmar el dominio definitivo (`pvcp.linaresdigital.com` frente a
       `pvpc.linaresdigital.com`) y usarlo de forma coherente en todo el proyecto.
-- [ ] DNS: crear `CNAME pvcp → pvpc-espana.github.io` y
-      `CNAME datos.pvcp → pvpc-espana.github.io`.
+- [ ] DNS: crear `CNAME pvpc → pvpc-espana.github.io` y
+      `CNAME datos.pvpc → pvpc-espana.github.io`.
 - [ ] Verificar el dominio `linaresdigital.com` en la organización de GitHub
       (*Settings → Pages → Verified domains*) para evitar apropiaciones de subdominios.
 - [ ] Generar la clave de despliegue ed25519 (README §3.3):
@@ -81,7 +79,7 @@ válido y los tests pasan.
 
 ## Fase 3 · Repositorio `datos`
 
-**Objetivo:** datos accesibles en `https://datos.pvcp.linaresdigital.com/v1/...`.
+**Objetivo:** datos accesibles en `https://datos.pvpc.linaresdigital.com/v1/...`.
 
 - [ ] Estructura inicial `docs/` con `CNAME`, `.nojekyll`, `index.html` informativo y
       `v1/indice.json`.
@@ -92,7 +90,7 @@ válido y los tests pasan.
       `workflow_dispatch` por rangos, para que el frontal tenga días anteriores.
 - [ ] Comprobar desde un navegador que `fetch` desde otro origen funciona (CORS).
 
-**Hecho cuando:** `curl https://datos.pvcp.linaresdigital.com/v1/indice.json`
+**Hecho cuando:** `curl https://datos.pvpc.linaresdigital.com/v1/indice.json`
 devuelve el índice con HTTPS válido.
 
 ## Fase 4 · Frontal: base de la aplicación
@@ -115,9 +113,9 @@ devuelve el índice con HTTPS válido.
 - [ ] Workflow de `frontal`: en cada push a la rama principal, lint + tests + build y
       commit de `/docs` si cambia (ignorando cambios en `docs/**` para no entrar en
       bucle), o build local documentado si se prefiere.
-- [ ] Activar GitHub Pages con dominio `pvcp.linaresdigital.com` y HTTPS.
+- [ ] Activar GitHub Pages con dominio `pvpc.linaresdigital.com` y HTTPS.
 
-**Hecho cuando:** `https://pvcp.linaresdigital.com/es/<hoy>` muestra los precios reales.
+**Hecho cuando:** `https://pvpc.linaresdigital.com/es/<hoy>` muestra los precios reales.
 
 ## Fase 5 · Frontal: navegación entre días
 
