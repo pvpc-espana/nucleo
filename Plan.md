@@ -10,7 +10,7 @@ Arquitectura, formato de datos y tecnologías: ver [`README.md`](README.md).
 ## Fase 0 · Preparación de la infraestructura
 
 **Objetivo:** que los tres repositorios y los dominios estén listos para publicar.
-      `pvpc.linaresdigital.com`) y usarlo de forma coherente en todo el proyecto.
+
 - [ ] DNS: crear `CNAME pvpc → pvpc-espana.github.io` y
       `CNAME datos.pvpc → pvpc-espana.github.io`.
 - [ ] Verificar el dominio `linaresdigital.com` en la organización de GitHub
