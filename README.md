@@ -20,7 +20,7 @@ El proyecto se divide en tres repositorios dentro de la organización `pvpc-espa
 |-------------|---------|-------------|
 | [`nucleo`](https://github.com/pvpc-espana/nucleo) | GitHub Action programada que consulta 4 veces al día la API pública de precios, normaliza los datos y los publica en `datos`. | — (sólo se ejecuta) |
 | [`datos`](https://github.com/pvpc-espana/datos) | Almacén de datos estáticos (JSON) en `/docs`, servidos por GitHub Pages. | `https://datos.pvpc.linaresdigital.com` |
-| [`frontal`](https://github.com/pvpc-espana/frontal) | Interfaz web (SPA) compilada en `/docs`, servida por GitHub Pages, que lee los JSON de `datos` mediante `fetch`. | `https://pvpc.linaresdigital.com` |
+| [`frontal`](https://github.com/pvpc-espana/frontal) | Interfaz web (SPA) en Angular, compilada y publicada en GitHub Pages con GitHub Actions; lee los JSON de `datos` mediante `fetch`. | `https://pvpc.linaresdigital.com` |
 
 No hay servidor propio ni base de datos: todo es contenido estático versionado en Git
 y publicado con GitHub Pages. El histórico de precios queda registrado en el
@@ -81,7 +81,7 @@ historial de commits del repositorio `datos`.
                                           ▲ fetch (CORS: GitHub Pages
                                           │ responde con ACAO *)
                               ┌────────────────────────────────┐
-                              │ frontal (GitHub Pages, /docs)  │
+                              │ frontal (GitHub Pages, Actions)│
                               │ pvpc.linaresdigital.com        │
                               │ Angular SPA, 6 idiomas         │
                               └────────────────────────────────┘
@@ -204,9 +204,22 @@ subdominio.
   detección por `navigator.language`, selector manual persistido y formato
   numérico/fechas con `Intl`. Permite cambiar de idioma sin recargar y mantener un
   único *build*.
-- **Compilación a `/docs`** (`outputPath: { base: "docs", browser: "" }`), con
-  `CNAME`, `.nojekyll` y `404.html` (copia de `index.html`) para que las rutas
-  profundas funcionen en GitHub Pages.
+- **Publicación con GitHub Actions** (workflow `publicar.yml`): en cada push a
+  `main` se ejecutan lint y tests, se compila con `ng build`
+  (`outputPath: { base: "dist", browser: "" }`), se copia `index.html` como
+  `404.html` para que las rutas profundas funcionen y se despliega con
+  `actions/upload-pages-artifact` + `actions/deploy-pages`. El código compilado no
+  se guarda en Git y el dominio propio se configura en *Settings → Pages* (con
+  este método GitHub ignora el fichero `CNAME`).
+
+### 3.6 ¿Por qué dos métodos de publicación?
+
+- **`datos` publica desde la rama (`main`, carpeta `/docs`)**: los JSON ya los
+  versiona el núcleo y no hay nada que compilar; cada push se publica solo, sin
+  workflow propio, y `.nojekyll` evita el procesado de Jekyll.
+- **`frontal` publica con GitHub Actions**: necesita Node para compilar; así no se
+  versionan ficheros generados (con *hash* en el nombre, que ensuciarían el
+  historial y provocarían conflictos) y sólo se publica lo que pasa las pruebas.
 
 ## 4. Tecnologías
 
@@ -216,7 +229,7 @@ subdominio.
 | Automatización | GitHub Actions (`schedule`, `workflow_dispatch`, `concurrency`) |
 | Acceso a `datos` | Clave de despliegue SSH ed25519 con permiso de escritura + secreto de Actions |
 | Fuente de datos | API e·sios de REE, indicador 1001, con secreto `TESTIGO`; `apidatos.ree.es` como respaldo |
-| Alojamiento | GitHub Pages (rama principal, carpeta `/docs`) con dominio propio y HTTPS |
+| Alojamiento | GitHub Pages con dominio propio y HTTPS: `datos` desde rama (`main`, `/docs`); `frontal` desde GitHub Actions |
 | DNS | Registros `CNAME` de `pvpc` y `datos.pvpc` hacia `pvpc-espana.github.io` |
 | Frontal | Angular (versión estable vigente), TypeScript, SCSS, Transloco, `Intl` |
 | Gráficos | SVG generado por el propio componente (sin librería de gráficos) |

@@ -98,8 +98,8 @@ devuelve el índice con HTTPS válido.
 **Objetivo:** SPA publicada que muestra los precios de un día.
 
 - [ ] Crear proyecto Angular (standalone, SCSS, *signals*, sin SSR) en `frontal`.
-- [ ] Configurar compilación en `/docs` (`outputPath: { base: "docs", browser: "" }`),
-      `CNAME`, `.nojekyll` y copia de `index.html` como `404.html` tras el build.
+- [ ] Configurar la compilación en `dist/` (`outputPath: { base: "dist", browser: "" }`)
+      y el script `npm run build` que usa el workflow `publicar.yml`.
 - [ ] Rutas: `/:idioma/:fecha` (por defecto hoy en `Europe/Madrid`), con validación
       de fecha y redirección de rutas desconocidas.
 - [ ] `PreciosService`: URL base configurable por entorno, caché en memoria,
@@ -110,10 +110,12 @@ devuelve el índice con HTTPS válido.
   - hora actual resaltada y desplazada a la vista;
   - **rejilla fija de horas** (23/24/25 según el día) también cuando no hay datos,
     con un aviso «Precios aún no publicados» sin alterar el diseño.
-- [ ] Workflow de `frontal`: en cada push a la rama principal, lint + tests + build y
-      commit de `/docs` si cambia (ignorando cambios en `docs/**` para no entrar en
-      bucle), o build local documentado si se prefiere.
-- [ ] Activar GitHub Pages con dominio `pvpc.linaresdigital.com` y HTTPS.
+- [x] Workflow `publicar.yml` de `frontal` (GitHub Actions): compila si existe
+      `package.json` (o publica `provisional/` mientras no haya Angular), copia
+      `index.html` como `404.html` y despliega con `actions/deploy-pages`.
+- [ ] Añadir al workflow los pasos de lint y tests antes de compilar.
+- [x] GitHub Pages con fuente «GitHub Actions» y dominio `pvpc.linaresdigital.com`.
+- [ ] Activar «Enforce HTTPS» cuando el certificado esté emitido.
 
 **Hecho cuando:** `https://pvpc.linaresdigital.com/es/<hoy>` muestra los precios reales.
 
