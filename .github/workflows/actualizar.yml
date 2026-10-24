@@ -56,6 +56,18 @@ jobs:
           # La última ejecución del día exige que ya estén los precios de mañana
           case "$CRON" in "30 22 * * *"|"30 21 * * *") echo "exigir=--exigir-manana" >> "$GITHUB_OUTPUT" ;; esac
 
+      - name: Comprobar secretos
+        if: steps.horario.outputs.ejecutar == 'true'
+        env:
+          CLAVE: ${{ secrets.DATOS_DEPLOY_KEY }}
+          TESTIGO: ${{ secrets.TESTIGO }}
+        run: |
+          if [ -z "$CLAVE" ]; then
+            echo "::error::Falta el secreto DATOS_DEPLOY_KEY (clave privada de despliegue con escritura en datos)"
+            exit 1
+          fi
+          [ -n "$TESTIGO" ] || echo "::warning::Falta el secreto TESTIGO: se usará sólo apidatos.ree.es"
+
       - if: steps.horario.outputs.ejecutar == 'true'
         uses: actions/checkout@v5
 

@@ -42,7 +42,13 @@ def procesar(dias: list[date], salida: Path, testigo: str | None) -> tuple[list[
             log.info("%s: aún sin publicar", dia)
             pendientes.append(dia)
         elif publicar_dia(salida, documento):
-            log.info("%s: actualizado", dia)
+            log.info(
+                "%s: actualizado (%d periodos %s, media %.5f €/kWh)",
+                dia,
+                len(documento["precios"]),
+                documento["resolucion"],
+                documento["resumen"]["media"],
+            )
             cambios = True
         else:
             log.info("%s: sin cambios", dia)
