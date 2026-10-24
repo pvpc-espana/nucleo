@@ -166,6 +166,21 @@ devuelve el índice con HTTPS válido.
 **Hecho cuando:** en un móvil real se recorren varios días deslizando sin recargas ni
 saltos de diseño.
 
+## Fase 5b · Recordatorios en el calendario
+
+- [x] Campana en cada hora (sólo horas con precio que no han terminado) y botón
+      «Más baratas», que marca las horas con icono ✅ aún por llegar.
+- [x] Barra inferior con el número de horas marcadas, «Quitar» y «Añadir al
+      calendario».
+- [x] Las horas consecutivas se agrupan en franjas: un evento con aviso al comienzo
+      (`VALARM`, `TRIGGER:PT0M`) por franja, con los precios en la descripción.
+- [x] Fichero `.ics` (RFC 5545, UTC, líneas plegadas) para el calendario del
+      dispositivo y un enlace de Google Calendar por franja.
+- [ ] Probar la importación del `.ics` en iPhone, Android (Google Calendar y
+      Samsung Calendar) y Outlook.
+- [ ] Opcional: notificaciones *push* (Web Push) con un pequeño servicio externo,
+      una vez la web sea instalable (PWA).
+
 ## Fase 6 · Internacionalización
 
 **Objetivo:** interfaz completa en es, en, fr, de, it y pt.

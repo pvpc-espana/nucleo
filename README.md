@@ -47,6 +47,9 @@ historial de commits del repositorio `datos`.
   - Cada hora con **color e icono según umbrales de precio** (barata, media, cara,
     muy barata), como en el correo diario que ya genera el flujo de n8n (§3.8).
   - **Tema claro/oscuro** según el sistema operativo, con cambio manual (§3.8).
+  - **Recordatorios**: marcar horas (o las más baratas) y añadirlas al calendario
+    del dispositivo (`.ics`) o a Google Calendar, con aviso al comienzo de cada
+    franja.
 - Interfaz en **6 idiomas**: castellano (por defecto), inglés, francés, alemán,
   italiano y portugués, con formato de números, fechas y moneda según el idioma.
 - Horas expresadas en **hora peninsular** (`Europe/Madrid`), contemplando los días de
