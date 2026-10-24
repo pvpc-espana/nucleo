@@ -15,12 +15,12 @@ Arquitectura, formato de datos y tecnologías: ver [`README.md`](README.md).
       `CNAME datos.pvpc → pvpc-espana.github.io`.
 - [x] Verificar el dominio `linaresdigital.com` en la organización de GitHub
       (*Settings → Pages → Verified domains*) para evitar apropiaciones de subdominios.
-- [ ] Generar la clave de despliegue ed25519 (README §3.3):
+- [x] Generar la clave de despliegue ed25519 (README §3.3):
   - pública en `datos` → *Deploy keys* con escritura;
   - privada en `nucleo` → secreto `DATOS_DEPLOY_KEY`.
 - [ ] Proteger la rama principal de `datos` permitiendo el push de la clave de
       despliegue (o dejarla sin protección si sólo escribe el núcleo).
-- [ ] Guardar el *token* de e·sios en `nucleo` como secreto de Actions `TESTIGO`.
+- [x] Guardar el *token* de e·sios en `nucleo` como secreto de Actions `TESTIGO`.
 
 **Hecho cuando:** los registros DNS resuelven y el secreto está creado.
 
@@ -33,7 +33,8 @@ Arquitectura, formato de datos y tecnologías: ver [`README.md`](README.md).
       y documentarlas con ejemplos
       guardados en `tests/fixtures/` (día normal, día de 23 h, día de 25 h, día no
       publicado aún, error del servidor).
-- [ ] Validar la granularidad del PVPC (horaria o cuartohoraria) y fijar `resolucion`.
+- [x] Validar la granularidad del PVPC: e·sios lo publica por horas (`PT1H`; 25 periodos
+      el 25/10/2026), aunque el código admite también cuartos de hora.
 - [x] Cliente `fuente_esios.py` que lee el *token* de la variable de entorno
       `TESTIGO`, con tiempo de espera, reintentos con espera exponencial y cabecera
       `User-Agent` identificativa; sin exponer el *token* en registros.
@@ -95,7 +96,7 @@ válido y los tests pasan.
 - [ ] README de `datos` con el formato v1, política de versiones y licencia/origen.
 - [ ] Carga histórica (*backfill*) desde la fecha de inicio elegida mediante
       `workflow_dispatch` por rangos, para que el frontal tenga días anteriores.
-- [ ] Comprobar desde un navegador que `fetch` desde otro origen funciona (CORS).
+- [x] Comprobar desde un navegador que `fetch` desde otro origen funciona (CORS).
 
 **Hecho cuando:** `curl https://datos.pvpc.linaresdigital.com/v1/indice.json`
 devuelve el índice con HTTPS válido.
