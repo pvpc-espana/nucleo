@@ -57,9 +57,16 @@ válido y los tests pasan.
       determinista (claves ordenadas, sangría fija, salto de línea final) y
       actualiza `indice.json` **sólo** si algún fichero diario cambió.
 - [ ] Lógica de fechas: siempre hoy y mañana en `Europe/Madrid`; mañana sin publicar
-      no es error. Parámetro opcional para fechas concretas o rangos.
+      no es error. Parámetro opcional para fechas concretas o rangos. El rango de
+      la consulta va de medianoche a medianoche en `Europe/Madrid` con desfase
+      explícito (nunca calculado en UTC), con tests de los días de 23 y 25 horas.
 - [ ] `.github/workflows/actualizar.yml`:
-  - `schedule` con los 4 cron de README §3.2 y `workflow_dispatch` (fecha opcional);
+  - `schedule` con los 8 cron de README §3.2 (07:00, 20:10, 21:00 y 23:30 hora
+    peninsular, en sus versiones de invierno y verano) y `workflow_dispatch`
+    (fecha o rango opcional);
+  - primer paso que compara `github.event.schedule` con el desfase actual de
+    `Europe/Madrid` y termina sin hacer nada si el cron no es el de la estación
+    vigente (las ejecuciones manuales no se filtran);
   - `concurrency: actualizar-datos` para evitar ejecuciones solapadas;
   - checkout de `nucleo` y de `datos` (ruta `datos/`, `ssh-key: DATOS_DEPLOY_KEY`);
   - `env: TESTIGO: ${{ secrets.TESTIGO }}` sólo en el paso que consulta la API;
@@ -71,8 +78,8 @@ válido y los tests pasan.
       (p. ej. workflow mensual que reactiva el workflow vía API o commit de
       mantenimiento en `nucleo`).
 - [ ] Alertas: el fallo del workflow notifica por correo a los responsables;
-      opcionalmente abrir una *issue* automática si mañana no se ha publicado a las
-      23:37.
+      opcionalmente abrir una *issue* automática si mañana no se ha publicado en la
+      ejecución de las 23:30.
 
 **Hecho cuando:** dos ejecuciones manuales seguidas producen un único commit en
 `datos` (la segunda no cambia nada).
@@ -114,8 +121,9 @@ devuelve el índice con HTTPS válido.
       `localStorage`, escucha de cambios de `prefers-color-scheme`, `color-scheme`
       y `theme-color` actualizados, y script en línea en `<head>` (con su *hash* en
       la CSP) que evita el destello del tema equivocado.
-- [ ] Confirmar los umbrales reales del flujo de n8n y fijarlos en `umbrales.ts`,
-      con tests que reproduzcan la clasificación del correo del 25/10/2026.
+- [ ] `umbrales.ts` con los umbrales del flujo de n8n (color: 0,33 / 0,66; icono:
+      0,15 / 0,85 sobre la posición relativa en el rango del día) y tests que
+      reproduzcan la clasificación del correo del 25/10/2026.
 - [ ] `PreciosService`: URL base configurable por entorno, caché en memoria,
       404 → día sin datos, errores de red con mensaje y reintento.
 - [ ] Componente de día *mobile-first*:
@@ -200,6 +208,10 @@ ficheros de idioma están completos.
 - [ ] Publicar la v1.0 (etiquetas en los tres repositorios).
 
 ## Ampliaciones futuras
+
+- Recomendación de las mejores franjas para consumir (calculada de forma
+  determinista a partir de los precios, como alternativa al modelo de lenguaje que
+  usa el flujo de n8n).
 
 - PVPC de Ceuta y Melilla y opción de hora canaria.
 - PWA instalable con caché sin conexión y notificaciones de horas baratas.

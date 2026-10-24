@@ -96,11 +96,16 @@ historial de commits del repositorio `datos`.
 
 - **Principal:** API de e·sios (REE), indicador **`1001`** (PVPC 2.0TD), autenticada
   con un *token* personal guardado como secreto de Actions **`TESTIGO`**:
-  `https://api.esios.ree.es/indicators/1001?start_date=AAAA-MM-DDT00:00&end_date=AAAA-MM-DDT23:59`
+  `https://api.esios.ree.es/indicators/1001?start_date=…&end_date=…&geo_ids[]=8741`
   con las cabeceras `Accept: application/json; application/vnd.esios-api-v1+json` y
   `x-api-key: <TESTIGO>`. Permite obtener el día siguiente en cuanto se publica y
   también días pasados (carga histórica). De la respuesta se toman los valores de la
   zona peninsular (`geo_id` 8741), que aplican también a Baleares y Canarias.
+- `start_date` y `end_date` se calculan como **medianoche en `Europe/Madrid`** del
+  día pedido y del siguiente, con su desfase horario explícito
+  (p. ej. `2026-10-25T00:00:00+02:00` → `2026-10-26T00:00:00+01:00`). Calcularlas
+  en UTC desplaza el día y pierde horas: es lo que le ocurre al flujo actual de
+  n8n, que usa `setHours(0)` en un servidor en UTC.
 - **Respaldo (sin autenticación):** API pública `apidatos.ree.es`
   (`/es/datos/mercados/precios-mercados-tiempo-real?...&time_trunc=hour`), serie
   PVPC; sólo se usa si e·sios falla.
@@ -113,19 +118,29 @@ historial de commits del repositorio `datos`.
 
 ### 3.2 Programación del núcleo
 
-GitHub Actions usa `cron` en **UTC**. Se proponen estas ejecuciones:
+Los precios del día siguiente se publican a partir de las **20:00** (hora
+peninsular) y se recomienda esperar unos minutos. Las ejecuciones deseadas, en hora
+`Europe/Madrid`, son:
 
-| Cron (UTC) | Invierno (UTC+1) | Verano (UTC+2) | Objetivo |
-|-----------|------------------|----------------|----------|
-| `7 0 * * *`  | 01:07 | 02:07 | Confirmar el día en curso (recién empezado). |
-| `7 10 * * *` | 11:07 | 12:07 | Detectar correcciones del día en curso. |
-| `37 19 * * *` | 20:37 | 21:37 | Obtener el día siguiente (publicado ~20:15). |
-| `37 21 * * *` | 22:37 | 23:37 | Reintento del día siguiente si la anterior no lo obtuvo. |
+| Hora peninsular | Cron invierno (CET, UTC+1) | Cron verano (CEST, UTC+2) | Objetivo |
+|---|---|---|---|
+| 07:00 | `0 6 * * *`   | `0 5 * * *`   | Confirmar que están los precios del día en curso. |
+| 20:10 | `10 19 * * *` | `10 18 * * *` | Primer intento de obtener el día siguiente. |
+| 21:00 | `0 20 * * *`  | `0 19 * * *`  | Reintento del día siguiente. |
+| 23:30 | `30 22 * * *` | `30 21 * * *` | Último reintento del día siguiente (y alerta si falta). |
 
-En cada ejecución se consultan **hoy y mañana** (hora `Europe/Madrid`); si mañana aún
-no está publicado, se ignora sin error. Los minutos no son en punto para evitar la
-congestión de las colas de GitHub. Se añade `workflow_dispatch` (con fecha opcional)
-para ejecuciones manuales y recargas históricas.
+GitHub Actions sólo admite `cron` en **UTC**, así que el workflow declara los 8
+cron y su primer paso compara `github.event.schedule` (la expresión que lo ha
+disparado) con el desfase horario actual de `Europe/Madrid`: si el cron no es el
+de la estación vigente, el trabajo termina sin hacer nada. Así se ejecuta
+exactamente 4 veces al día todo el año, aunque GitHub retrase la ejecución
+(los retrasos de varios minutos son habituales, sobre todo en horas en punto).
+
+En cada ejecución se consultan **hoy y mañana** (hora `Europe/Madrid`): así la de
+las 07:00 confirma el día en curso y las de la tarde-noche obtienen el siguiente y
+detectan correcciones del actual. Si mañana aún no está publicado, se ignora sin
+error. Se añade `workflow_dispatch` (con fecha o rango opcional) para ejecuciones
+manuales y recargas históricas.
 
 > GitHub desactiva los workflows programados de un repositorio público tras 60 días
 > sin actividad en él. Como los commits se hacen en `datos` y no en `nucleo`, se
@@ -265,17 +280,20 @@ orientativo) quedan muy por encima del uso previsto.
 
 Cada hora combina un **color** (tramo) y un **icono**:
 
-| Tramo | Color | Icono | Regla por defecto (a confirmar) |
-|---|---|---|---|
-| Muy barata | verde | ✅ | Tramo barato y precio ≤ 0,10 €/kWh |
-| Barata | verde | 🔘 | Precio en el tercio inferior del rango del día (`(p − mín) / (máx − mín) < 1/3`) |
-| Media | naranja | 🔘 | Tercio central del rango del día |
-| Cara | rojo | ⚠️ | Tercio superior del rango del día (`≥ 2/3`) |
+Ambos dependen de la posición relativa del precio dentro del rango del día,
+`r = (precio − mín) / (máx − mín)` (si `máx = mín`, `r = 0`), con los mismos
+umbrales que el flujo de n8n:
 
-Las reglas se infieren del correo del 25/10/2026, al que se ajustan exactamente
-(p. ej. 0,1190 €: verde 🔘; 0,0545 €: verde ✅; 0,2326 €: naranja; 0,3095 €: rojo
-⚠️). Los umbrales viven en un único fichero de configuración del frontal
-(`umbrales.ts`) para poder ajustarlos sin tocar los componentes.
+| Color | Regla | | Icono | Regla |
+|---|---|---|---|---|
+| Verde (barata) | `r ≤ 0,33` | | ✅ (de las más baratas) | `r < 0,15` |
+| Naranja (media) | `0,33 < r ≤ 0,66` | | 🔘 (normal) | `0,15 ≤ r ≤ 0,85` |
+| Rojo (cara) | `r > 0,66` | | ⚠️ (de las más caras) | `r > 0,85` |
+
+Color e icono son independientes (p. ej. una hora con `r = 0,25` es verde con 🔘, y
+una con `r = 0,75` es roja con 🔘). Los umbrales viven en un único fichero de
+configuración del frontal (`umbrales.ts`) para poder ajustarlos sin tocar los
+componentes.
 
 - En la web los iconos se dibujan como SVG propios (aspecto idéntico en todos los
   sistemas, a diferencia de los emojis) y llevan texto accesible traducido
@@ -285,8 +303,9 @@ Las reglas se infieren del correo del 25/10/2026, al que se ajustan exactamente
 
 > El correo de ejemplo corresponde al 25/10/2026, día de **25 horas** por el cambio
 > al horario de invierno, y sólo lista de 02:00 a 23:00 (faltan 00:00, 01:00 y la
-> repetición de 02:00). La web debe mostrar siempre todas las horas del día
-> (README §3.4: `inicio` con desfase horario explícito).
+> repetición de 02:00) porque el flujo de n8n calcula el rango de fechas en UTC
+> (§3.1). La web debe mostrar siempre todas las horas del día (§3.4: `inicio` con
+> desfase horario explícito).
 
 ## 4. Tecnologías
 
