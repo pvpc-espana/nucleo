@@ -158,6 +158,10 @@ devuelve el índice con HTTPS válido.
       `Router.navigate` (historial del navegador coherente).
 - [x] Refresco automático del día en curso/siguiente al volver a la pestaña tras
       las ~20:30 si aún no había datos.
+- [x] Aviso de que ya hay precios de mañana: viendo hoy desde las 20:00 (hora
+      peninsular) se comprueba cada 5 minutos y al volver a la pestaña; si ya están
+      publicados, los botones «siguiente» laten (sin animación con
+      `prefers-reduced-motion`).
 
 **Hecho cuando:** en un móvil real se recorren varios días deslizando sin recargas ni
 saltos de diseño.
