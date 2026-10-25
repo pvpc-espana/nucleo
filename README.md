@@ -51,7 +51,8 @@ historial de commits del repositorio `datos`.
     del dispositivo (`.ics`) o a Google Calendar, con aviso al comienzo de cada
     franja.
   - **Instalable como aplicación** (PWA) en móvil y escritorio, con funcionamiento
-    sin conexión y aviso de nuevas versiones.
+    sin conexión y aviso de nuevas versiones. En Android ocupa menos de 1 MB
+    (detalle en el [README de `frontal`](https://github.com/pvpc-espana/frontal#espacio-que-ocupa-instalada-en-android)).
 - Interfaz en **6 idiomas**: castellano (por defecto), inglés, francés, alemán,
   italiano y portugués, con formato de números, fechas y moneda según el idioma.
 - Horas expresadas en **hora peninsular** (`Europe/Madrid`), contemplando los días de
