@@ -90,7 +90,7 @@ válido y los tests pasan.
       `v1/indice.json`.
 - [x] Activar GitHub Pages (rama principal, carpeta `/docs`), dominio propio y
       «Enforce HTTPS».
-- [ ] README de `datos` con el formato v1, política de versiones y licencia/origen.
+- [x] README de `datos` con el formato v1, política de versiones y licencia/origen.
 - [ ] Carga histórica (*backfill*) desde la fecha de inicio elegida mediante
       `workflow_dispatch` por rangos, para que el frontal tenga días anteriores.
 - [x] Comprobar desde un navegador que `fetch` desde otro origen funciona (CORS).

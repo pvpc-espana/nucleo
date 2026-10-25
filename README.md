@@ -350,8 +350,9 @@ nucleo/
 
 ## 6. Licencia
 
-GPL-3.0. Los datos de precios proceden de Red Eléctrica de España y se publican
-según sus condiciones de uso.
+GPL-3.0. Los datos de precios proceden de Red Eléctrica de España (e·sios) y se publican
+según sus condiciones de uso: origen, condiciones, formato y límites en el
+[README de `datos`](https://github.com/pvpc-espana/datos#readme).
 
 ## Agradecimientos
 
