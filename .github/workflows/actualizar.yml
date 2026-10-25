@@ -2,17 +2,11 @@ name: Actualizar precios
 
 on:
   schedule:
-    # Hora peninsular 07:00, 20:10, 21:00 y 23:30. GitHub sólo admite UTC, así que se
-    # declaran las versiones de invierno (CET) y verano (CEST); el paso «Comprobar
-    # horario» descarta las que no corresponden a la estación vigente.
-    - cron: "0 6 * * *" # invierno 07:00
-    - cron: "10 19 * * *" # invierno 20:10
-    - cron: "0 20 * * *" # invierno 21:00
-    - cron: "30 22 * * *" # invierno 23:30
-    - cron: "0 5 * * *" # verano 07:00
-    - cron: "10 18 * * *" # verano 20:10
-    - cron: "0 19 * * *" # verano 21:00
-    - cron: "30 21 * * *" # verano 23:30
+    # GitHub retrasa (a veces horas) o descarta ejecuciones programadas, así que no se
+    # confía en una hora exacta: se lanza cada 20 minutos en las franjas útiles (UTC) y el
+    # paso «Decidir» comprueba en hora peninsular si falta algo por publicar.
+    - cron: "7,27,47 18-22 * * *" # tarde-noche: 19:07-23:47 (invierno) / 20:07-00:47 (verano)
+    - cron: "17 4-8 * * *" # mañana: comprobar que está el día en curso
   workflow_dispatch:
     inputs:
       fecha:
@@ -42,26 +36,31 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Comprobar horario
+      - name: Decidir
         id: horario
-        env:
-          CRON: ${{ github.event.schedule }}
+        if: github.event_name == 'schedule'
         run: |
-          if [ -z "$CRON" ]; then echo "ejecutar=true" >> "$GITHUB_OUTPUT"; exit 0; fi
-          desfase=$(TZ=Europe/Madrid date +%z)
-          case "$desfase:$CRON" in
-            "+0100:0 6 * * *"|"+0100:10 19 * * *"|"+0100:0 20 * * *"|"+0100:30 22 * * *"| \
-            "+0200:0 5 * * *"|"+0200:10 18 * * *"|"+0200:0 19 * * *"|"+0200:30 21 * * *")
-              echo "ejecutar=true" >> "$GITHUB_OUTPUT" ;;
-            *)
-              echo "Cron «$CRON» no corresponde al horario vigente ($desfase); nada que hacer."
-              echo "ejecutar=false" >> "$GITHUB_OUTPUT" ;;
-          esac
-          # La última ejecución del día exige que ya estén los precios de mañana
-          case "$CRON" in "30 22 * * *"|"30 21 * * *") echo "exigir=--exigir-manana" >> "$GITHUB_OUTPUT" ;; esac
+          # Todo en hora peninsular y según lo que ya está publicado, no según el cron
+          hora=$(TZ=Europe/Madrid date +%H%M)
+          hoy=$(TZ=Europe/Madrid date +%F)
+          manana=$(TZ=Europe/Madrid date -d "$hoy 12:00 +1 day" +%F)
+          publicado() {
+            curl -sfI -o /dev/null "https://datos.pvpc.linaresdigital.com/v1/${1:0:4}/${1:5:2}/$1.json"
+          }
+          if ! publicado "$hoy"; then
+            echo "Falta el día en curso ($hoy)."
+            echo "exigir=--exigir-hoy" >> "$GITHUB_OUTPUT"
+          elif [ "$hora" -ge 2000 ] && ! publicado "$manana"; then
+            echo "Son las $hora y falta mañana ($manana)."
+            # Último intento razonable de la noche: avisar (correo de fallo) si sigue sin estar
+            if [ "$hora" -ge 2340 ]; then echo "exigir=--exigir-manana" >> "$GITHUB_OUTPUT"; fi
+          else
+            echo "Son las $hora: hoy ya está publicado y mañana no toca o ya está; nada que hacer."
+            echo "ejecutar=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Comprobar secretos
-        if: steps.horario.outputs.ejecutar == 'true'
+        if: steps.horario.outputs.ejecutar != 'false'
         env:
           CLAVE: ${{ secrets.DATOS_DEPLOY_KEY }}
           TESTIGO: ${{ secrets.TESTIGO }}
@@ -72,23 +71,23 @@ jobs:
           fi
           [ -n "$TESTIGO" ] || echo "::warning::Falta el secreto TESTIGO: se usará sólo apidatos.ree.es"
 
-      - if: steps.horario.outputs.ejecutar == 'true'
+      - if: steps.horario.outputs.ejecutar != 'false'
         uses: actions/checkout@v5
 
-      - if: steps.horario.outputs.ejecutar == 'true'
+      - if: steps.horario.outputs.ejecutar != 'false'
         uses: actions/checkout@v5
         with:
           repository: pvpc-espana/datos
           ssh-key: ${{ inputs.simular != true && secrets.DATOS_DEPLOY_KEY || '' }}
           path: datos
 
-      - if: steps.horario.outputs.ejecutar == 'true'
+      - if: steps.horario.outputs.ejecutar != 'false'
         uses: actions/setup-python@v6
         with:
           python-version: "3.13"
 
       - name: Obtener y publicar precios
-        if: steps.horario.outputs.ejecutar == 'true'
+        if: steps.horario.outputs.ejecutar != 'false'
         env:
           TESTIGO: ${{ secrets.TESTIGO }}
           FECHA: ${{ inputs.fecha }}
@@ -126,7 +125,7 @@ jobs:
           exit $estado
 
       - name: Mantener activo el workflow
-        if: steps.horario.outputs.ejecutar == 'true' && github.event_name == 'schedule'
+        if: steps.horario.outputs.ejecutar != 'false' && github.event_name == 'schedule'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/actualizar.yml/enable"

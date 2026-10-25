@@ -62,12 +62,10 @@ válido y los tests pasan.
       la consulta va de medianoche a medianoche en `Europe/Madrid` con desfase
       explícito (nunca calculado en UTC), con tests de los días de 23 y 25 horas.
 - [x] `.github/workflows/actualizar.yml`:
-  - `schedule` con los 8 cron de README §3.2 (07:00, 20:10, 21:00 y 23:30 hora
-    peninsular, en sus versiones de invierno y verano) y `workflow_dispatch`
-    (fecha o rango opcional);
-  - primer paso que compara `github.event.schedule` con el desfase actual de
-    `Europe/Madrid` y termina sin hacer nada si el cron no es el de la estación
-    vigente (las ejecuciones manuales no se filtran);
+  - `schedule` cada 20 minutos de 18:07 a 22:47 UTC y cada hora de 04:17 a 08:17 UTC,
+    con un paso «Decidir» que, en hora peninsular, sólo continúa si falta el día en curso
+    o, desde las 20:00, el siguiente (README §3.2). Sustituye a los 8 cron de hora fija,
+    porque GitHub retrasaba las ejecuciones programadas varias horas;
   - `concurrency: actualizar-datos` para evitar ejecuciones solapadas;
   - checkout de `nucleo` y de `datos` (ruta `datos/`, `ssh-key: DATOS_DEPLOY_KEY`);
   - `env: TESTIGO: ${{ secrets.TESTIGO }}` sólo en el paso que consulta la API;
@@ -79,8 +77,7 @@ válido y los tests pasan.
       (p. ej. workflow mensual que reactiva el workflow vía API o commit de
       mantenimiento en `nucleo`).
 - [x] Alertas: el fallo del workflow notifica por correo a los responsables;
-      opcionalmente abrir una *issue* automática si mañana no se ha publicado en la
-      ejecución de las 23:30.
+      opcionalmente abrir una *issue* automática si mañana no se ha publicado a las 23:40.
 
 **Hecho cuando:** dos ejecuciones manuales seguidas producen un único commit en
 `datos` (la segunda no cambia nada).

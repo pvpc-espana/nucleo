@@ -68,6 +68,11 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="termina con error si mañana aún no está publicado",
     )
+    parser.add_argument(
+        "--exigir-hoy",
+        action="store_true",
+        help="termina con error si el día en curso no está publicado",
+    )
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 
@@ -86,6 +91,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.exigir_manana and hoy_ + timedelta(days=1) in pendientes:
         log.error("Los precios de mañana siguen sin publicarse")
+        return 1
+    if args.exigir_hoy and hoy_ in pendientes:
+        log.error("Los precios del día en curso no están publicados")
         return 1
     return 1 if errores else 0
 

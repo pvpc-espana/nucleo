@@ -124,29 +124,29 @@ historial de commits del repositorio `datos`.
 
 ### 3.2 Programación del núcleo
 
-Los precios del día siguiente se publican a partir de las **20:00** (hora
-peninsular) y se recomienda esperar unos minutos. Las ejecuciones deseadas, en hora
-`Europe/Madrid`, son:
+Los precios del día siguiente se publican a partir de las **20:00** (hora peninsular).
+GitHub Actions sólo admite `cron` en **UTC** y, en la práctica, **retrasa las
+ejecuciones programadas (a veces varias horas) o las descarta** cuando hay mucha carga.
+Por eso no se programa una hora exacta, sino ejecuciones frecuentes en las franjas útiles
+y una decisión basada en lo que ya está publicado:
 
-| Hora peninsular | Cron invierno (CET, UTC+1) | Cron verano (CEST, UTC+2) | Objetivo |
-|---|---|---|---|
-| 07:00 | `0 6 * * *`   | `0 5 * * *`   | Confirmar que están los precios del día en curso. |
-| 20:10 | `10 19 * * *` | `10 18 * * *` | Primer intento de obtener el día siguiente. |
-| 21:00 | `0 20 * * *`  | `0 19 * * *`  | Reintento del día siguiente. |
-| 23:30 | `30 22 * * *` | `30 21 * * *` | Último reintento del día siguiente (y alerta si falta). |
+| Cron (UTC) | Hora peninsular (invierno / verano) | Para qué |
+|---|---|---|
+| `7,27,47 18-22 * * *` | 19:07–23:47 / 20:07–00:47, cada 20 min | Obtener el día siguiente en cuanto se publique. |
+| `17 4-8 * * *` | 05:17–09:17 / 06:17–10:17, cada hora | Comprobar que está publicado el día en curso. |
 
-GitHub Actions sólo admite `cron` en **UTC**, así que el workflow declara los 8
-cron y su primer paso compara `github.event.schedule` (la expresión que lo ha
-disparado) con el desfase horario actual de `Europe/Madrid`: si el cron no es el
-de la estación vigente, el trabajo termina sin hacer nada. Así se ejecuta
-exactamente 4 veces al día todo el año, aunque GitHub retrase la ejecución
-(los retrasos de varios minutos son habituales, sobre todo en horas en punto).
+El primer paso del workflow («Decidir») calcula la hora peninsular y consulta
+`datos.pvpc.linaresdigital.com`:
 
-En cada ejecución se consultan **hoy y mañana** (hora `Europe/Madrid`): así la de
-las 07:00 confirma el día en curso y las de la tarde-noche obtienen el siguiente y
-detectan correcciones del actual. Si mañana aún no está publicado, se ignora sin
-error. Se añade `workflow_dispatch` (con fecha o rango opcional) para ejecuciones
-manuales y recargas históricas.
+1. Si **falta el día en curso** → se descarga (y la ejecución falla, avisando por correo,
+   si sigue sin poder publicarse).
+2. Si son **las 20:00 o más y falta mañana** → se descarga. A partir de las 23:40, si
+   sigue sin estar, la ejecución falla para avisar por correo.
+3. En otro caso **termina en unos segundos sin hacer nada**.
+
+Así, aunque GitHub retrase o pierda varias ejecuciones, la siguiente que llegue hace el
+trabajo, y una ejecución tardía nunca confunde «mañana» con otro día. Las ejecuciones
+manuales (`workflow_dispatch`, con fecha o rango opcional) no pasan por esta decisión.
 
 > GitHub desactiva los workflows programados de un repositorio público tras 60 días
 > sin actividad en él. Como los commits se hacen en `datos` y no en `nucleo`, se

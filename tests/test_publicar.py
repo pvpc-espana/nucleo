@@ -48,6 +48,7 @@ def test_cli_sin_cambios_no_toca_nada(salida):
         assert cli.main(["--salida", str(salida)]) == 0
         assert indice.stat().st_mtime_ns == primera
         assert cli.main(["--salida", str(salida), "--exigir-manana"]) == 1
+        assert cli.main(["--salida", str(salida), "--exigir-hoy"]) == 0
 
 
 def test_cli_error_de_datos_devuelve_1(salida):
