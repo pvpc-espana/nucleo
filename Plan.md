@@ -185,9 +185,11 @@ saltos de diseño.
 ## Fase 5c · Aplicación instalable (PWA)
 
 - [x] Manifiesto completo (`id`, `scope`, `description`, iconos 192/512 y *maskable*).
-- [x] *Service worker* de Angular: recursos precargados, JSON de precios con
-      estrategia *freshness* (red primero, caché sin conexión) y `ngsw.json`
-      recalculado tras generar las páginas de entrada.
+- [x] *Service worker* de Angular: recursos precargados y `ngsw.json` recalculado tras
+      generar las páginas de entrada.
+- [x] Modo sin conexión: precios de hoy y mañana guardados en `localStorage`; si falla
+      la descarga se muestran con el aviso «Sin conexión», que reintenta al pulsarlo o
+      al recuperar la red (evento `online`).
 - [x] Aviso «Nueva versión disponible · Actualizar» (comprobación cada 30 minutos y
       al volver a la pestaña); recarga automática si la caché queda inservible.
 - [x] Botón «Instalar»: diálogo del navegador (`beforeinstallprompt`) en Chrome, Edge y
